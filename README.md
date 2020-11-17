@@ -1,4 +1,4 @@
-# Analogue inputs on Raspberry Pi using MCP3208
+# Analogue inputs on Raspberry Pi using MCP3208 and SPI
 ### Sources used and adapted at this little research and investigation:
 * _MCP3208_
     * python library designed to work with the MCP3208 ADC using SPI
