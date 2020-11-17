@@ -9,6 +9,8 @@
     * https://github.com/doceme/py-spidev
 * _Raspberry Pi: SPI-Schnittstelle_
     * http://www.netzmafia.de/skripten/hardware/RasPi/RasPi_SPI.html
+* _RASPBERRY PI MIT MCP3208_
+    * https://www.vampire.de/index.php/2018/05/06/raspberry-pi-mit-mcp3208/
 * _MCP3008: Am Raspberry Pi analoge Signale auslesen_
     * https://tutorials-raspberrypi.de/raspberry-pi-mcp3008-analoge-signale-auslesen+/
 * _Raspberry PI - Adding analogue inputs using MCP3008, MCP3004, MCP3208, MCP3204_
