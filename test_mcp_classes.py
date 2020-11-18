@@ -12,7 +12,8 @@ adc4 = MCP3208Adafruit(device=1, speed=500_000)
 DELAY = .00001
 
 
-def test(adc, delay: float = DELAY):
+def test_all_channels(adc, delay: float = DELAY):
+    print(str(adc))
     while True:
         stdout.write("\r%s" %
                      "D0:{0:04} | ".format(adc.read(0)) +
@@ -28,8 +29,20 @@ def test(adc, delay: float = DELAY):
         time.sleep(delay)
 
 
+def test_one_channel(adc, channel: int, delay: float = DELAY):
+    print(str(adc))
+    while True:
+        stdout.write("\r%s" % f"D{channel}:{adc.read(channel)}")
+        stdout.flush()
+        time.sleep(delay)
+
+
 if __name__ == '__main__':
-    # test(adc1)
-    # test(adc2)
-    # test(adc3)
-    test(adc4)
+    # test_all_channels(adc1)
+    # test_all_channels(adc2)
+    test_all_channels(adc3)
+    # test_all_channels(adc4)
+    # test_one_channel(adc1, 0)
+    # test_one_channel(adc2, 8)
+    # test_one_channel(adc3, 8)
+    # test_one_channel(adc4, 8)
