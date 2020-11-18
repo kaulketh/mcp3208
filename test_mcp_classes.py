@@ -1,18 +1,17 @@
 import time
 from sys import stdout
 
-from mcp3208 import MCP3208 as MCP3208_BUILT_IN
+from adc import MCP3208AdafruitSPI
+from adc import MCP3208BuiltInSpi
 
-from mcp3208_own import MCP3208 as MCP3208_OWN
+adc_own = MCP3208BuiltInSpi()
+adc_builtIn = MCP3208AdafruitSPI()
 
-adc_own = MCP3208_OWN(speed=500000, device=0)
-adc_builtIn = MCP3208_BUILT_IN()
-"""https://pypi.org/project/mcp3208/"""
 
 DELAY = .00001
 
 
-def test_analogue_in_all_channels(adc, delay: float = DELAY):
+def test_all_channels(adc, delay: float = DELAY):
     while True:
         stdout.write("\r%s" %
                      "D0:{0:04} | ".format(adc.read(0)) +
@@ -29,5 +28,5 @@ def test_analogue_in_all_channels(adc, delay: float = DELAY):
 
 
 if __name__ == '__main__':
-    test_analogue_in_all_channels(adc_own)
-    # test_analogue_in_all_channels(adc_builtIn)
+    # test_all_channels(adc_own)
+    test_all_channels(adc_builtIn)
