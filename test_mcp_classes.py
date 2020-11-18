@@ -1,17 +1,18 @@
 import time
 from sys import stdout
 
-from adc import MCP3208AdafruitSPI
-from adc import MCP3208BuiltInSpi
+from adc import MCP3208Adafruit
+from adc import MCP3208Spidev
 
-adc_own = MCP3208BuiltInSpi()
-adc_builtIn = MCP3208AdafruitSPI()
-
+adc1 = MCP3208Spidev()
+adc2 = MCP3208Adafruit()
+adc3 = MCP3208Spidev(device=1, speed=500_000)
+adc4 = MCP3208Adafruit(device=1, speed=500_000)
 
 DELAY = .00001
 
 
-def test_all_channels(adc, delay: float = DELAY):
+def test(adc, delay: float = DELAY):
     while True:
         stdout.write("\r%s" %
                      "D0:{0:04} | ".format(adc.read(0)) +
@@ -28,5 +29,7 @@ def test_all_channels(adc, delay: float = DELAY):
 
 
 if __name__ == '__main__':
-    # test_all_channels(adc_own)
-    test_all_channels(adc_builtIn)
+    # test(adc1)
+    # test(adc2)
+    # test(adc3)
+    test(adc4)

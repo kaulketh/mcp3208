@@ -2,21 +2,22 @@ import spidev
 from Adafruit_GPIO import SPI
 from mcp3208 import MCP3208
 
+# number of channels to read from ADC,
+# MCP3208: 8 channels
+_MAX_CHANNELS = 8
+_EXC_MSG = "MCP3208 channel must be 0-7: "
 
-class MCP3208AdafruitSPI(MCP3208):
-    # noinspection LongLine
-    """
-    Adafruit_GPIO.SPI - Hardware-based SPI implementation using the spidev interface.
-    """
-    # number of channels to read from ADC,
-    # MCP3208: 8 channels
-    __MAX_CHANNELS = 8
 
-    def __init__(self,
-                 port: int = 0, device: int = 0, speed: int = 1_000_000):
-        self.__speed = speed
+class MCP3208Adafruit(MCP3208):
+    """
+    using Adafruit_GPIO.SPI,
+    Hardware-based SPI implementation using the spidev interface.
+    """
+
+    def __init__(self, device: int = 0, speed: int = 1_000_000):
+        self.__port = 0
         self.__device = device
-        self.__port = port
+        self.__speed = speed
         super().__init__()
         self.__init_spi()
 
@@ -27,23 +28,15 @@ class MCP3208AdafruitSPI(MCP3208):
         self.spi.set_bit_order(SPI.MSBFIRST)
 
     def read(self, channel):
-        if MCP3208AdafruitSPI.__MAX_CHANNELS <= channel < 0:
-            raise Exception(f"MCP3208 channel must be 0-7: {channel}")
-        return super(MCP3208AdafruitSPI, self).read(channel)
+        if _MAX_CHANNELS <= channel < 0:
+            raise Exception(f"{_EXC_MSG}{channel}")
+        return super(MCP3208Adafruit, self).read(channel)
 
 
-class MCP3208BuiltInSpi:
+class MCP3208Spidev:
     """
     using built-in module spidev
     """
-    # number of bits to read from ADC,
-    # including an empty and a null bit,
-    # MCP3208: 14 (12 bit + start + end)
-    __MCP_BITS_TO_READ = 14
-
-    # number of channels to read from ADC,
-    # MCP3208: 8 channels
-    __MAX_CHANNELS = 8
 
     def __init__(self, device: int = 0, speed: int = 1_000_000):
         # noinspection LongLine
@@ -75,8 +68,8 @@ class MCP3208BuiltInSpi:
         :param channel: 0-7 (D0 - D7 of MCP3208)
         :return: raw data value (12bit 0 - 4095)
         """
-        if MCP3208BuiltInSpi.__MAX_CHANNELS <= channel < 0:
-            raise Exception(f"MCP3208 channel must be 0-7: {channel}")
+        if _MAX_CHANNELS <= channel < 0:
+            raise Exception(f"{_EXC_MSG}{channel}")
 
         self.__adc = self.__spi.xfer2(
             [
