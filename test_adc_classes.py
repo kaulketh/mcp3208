@@ -13,7 +13,7 @@ DELAY = .00001
 
 
 def test_all_channels(adc, delay: float = DELAY):
-    print(str(adc))
+    print(adc.info)
     while True:
         stdout.write("\r%s" %
                      "D0:{0:04} | ".format(adc.read(0)) +
@@ -30,7 +30,7 @@ def test_all_channels(adc, delay: float = DELAY):
 
 
 def test_one_channel(adc, channel: int, delay: float = DELAY):
-    print(str(adc))
+    print(adc.info)
     while True:
         stdout.write("\r%s" % f"D{channel}:{adc.read(channel)}")
         stdout.flush()
@@ -45,4 +45,4 @@ if __name__ == '__main__':
     # test_one_channel(adc1, 0)
     # test_one_channel(adc2, 8)
     # test_one_channel(adc3, 8)
-    # test_one_channel(adc4, 8)
+    # test_one_channel(adc4, 3)

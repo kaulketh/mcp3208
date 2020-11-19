@@ -4,8 +4,13 @@ from mcp3208 import MCP3208
 
 
 def _check_channel_range(channel: int, min_ch: int, max_ch: int):
-    """Check number of channel to read from ADC,
-    MCP3208: 8 channels, 0-7"""
+    """
+    Number of channels to read from ADC:\n
+    MCP3004: 4 channels, min=0 max=3\n
+    MCP3008: 8 channels, min=0 max=7\n
+    MCP3204: 4 channels, min=0 max=3\n
+    MCP3208: 8 channels, min=0 max=7\n
+    """
     if channel not in range(min_ch, max_ch + 1, 1):
         raise Exception(f"Channel must be {min_ch}-{max_ch}: {channel}")
 
@@ -26,7 +31,16 @@ class MCP3208Adafruit(MCP3208):
         self.__spi.set_mode(0)
         self.__spi.set_bit_order(SPI.MSBFIRST)
 
+    @property
+    def info(self):
+        return f"ID:{id(self)} {self.__repr__()}"
+
     def read(self, channel):
+        """
+        overridden mcp3208.MCP3208.MCP3208.read(self, ch: {__and__}) -> int
+
+        :param channel: 0-7 (D0 - D7 of MCP3208)
+        :return: raw data value (12bit 0 - 4095)"""
         _check_channel_range(channel, 0, 7)
 
         cmd = 128  # 1000 0000
@@ -48,9 +62,11 @@ class MCP3208Spidev:
     """
 
     def __init__(self, device: int = 0, speed: int = 1_000_000):
+        # [skip pep8] ignore=E501
         # noinspection LongLine
         """
-        :param device: Raspberry chip set CE 0 - BCM8 (GPIO8) PIN24 or CE 1 - BCM7 (GPIO7) PIN26, 0 per default
+
+        :param device: RaspberryPi chip set CE0 BCM8 (GPIO8) PIN24 or CE1 BCM7 (GPIO7) PIN26, CE0 per default
         :param speed: Maximum speed in Hz, 1 MHz per default
         """
         self.__speed = speed
@@ -65,10 +81,15 @@ class MCP3208Spidev:
     def __del__(self):
         self.__spi.close()
 
+    @property
+    def info(self):
+        return f"ID:{id(self)} {self.__repr__()}"
+
     def read(self, channel: int):
         """
-        Read input channel of MCP3208
+        Read input channel of MCP3208\n
         https://www.vampire.de/index.php/2018/05/06/raspberry-pi-mit-mcp3208/
+
         :param channel: 0-7 (D0 - D7 of MCP3208)
         :return: raw data value (12bit 0 - 4095)
         """
