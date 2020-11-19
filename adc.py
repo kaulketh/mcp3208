@@ -63,6 +63,7 @@ class MCP3208Spidev:
 
     def __init__(self, device: int = 0, speed: int = 1_000_000):
         # noinspection LongLine
+        # [skip pep8] ignore=E501
         """
 
         :param device: RaspberryPi chip set CE0 BCM8 (GPIO8) PIN24 or CE1 BCM7 (GPIO7) PIN26, CE0 per default
