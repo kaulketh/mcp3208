@@ -41,7 +41,5 @@ def test_one_channel(adc, channel: int, delay: float = DELAY):
         time.sleep(delay)
 
 
-# Should work with kukmma test board connected to RasPi
-# by input change via potentiometers!
 if __name__ == '__main__':
     test_all_channels(adc_gzero)
