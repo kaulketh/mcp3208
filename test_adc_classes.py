@@ -1,13 +1,17 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+
+__author__ = "Thomas Kaulke"
+__email__ = "kaulketh@gmail.com"
+
 import time
 from sys import stdout
 
-from adc import MCP3208Adafruit
-from adc import MCP3208Spidev
+from spi import MCP3208Gpiozero, MCP3208Spidev, MCP3208Adafruit
 
-adc1 = MCP3208Spidev()
-adc2 = MCP3208Adafruit()
-adc3 = MCP3208Spidev(device=1, speed=500_000)
-adc4 = MCP3208Adafruit(device=1, speed=500_000)
+adc_gzero = MCP3208Gpiozero()
+adc_spidev = MCP3208Spidev()
+adc_adafr = MCP3208Adafruit()
 
 DELAY = .00001
 
@@ -37,12 +41,7 @@ def test_one_channel(adc, channel: int, delay: float = DELAY):
         time.sleep(delay)
 
 
+# Should work with kukmma test board connected to RasPi
+# by input change via potentiometers!
 if __name__ == '__main__':
-    # test_all_channels(adc1)
-    # test_all_channels(adc2)
-    test_all_channels(adc3)
-    # test_all_channels(adc4)
-    # test_one_channel(adc1, 0)
-    # test_one_channel(adc2, 8)
-    # test_one_channel(adc3, 8)
-    # test_one_channel(adc4, 3)
+    test_all_channels(adc_gzero)

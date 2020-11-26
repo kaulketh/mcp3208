@@ -1,6 +1,16 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+
+__author__ = "Thomas Kaulke"
+__email__ = "kaulketh@gmail.com"
+
+import Adafruit_GPIO
+import gpiozero
+import mcp3208
 import spidev
-from Adafruit_GPIO import SPI
-from mcp3208 import MCP3208
+
+_MIN_CHANNEL = 0
+_MAX_CHANNEL = 7
 
 
 def _check_channel_range(channel: int, min_ch: int, max_ch: int):
@@ -12,24 +22,23 @@ def _check_channel_range(channel: int, min_ch: int, max_ch: int):
     MCP3208: 8 channels, min=0 max=7\n
     """
     if channel not in range(min_ch, max_ch + 1, 1):
-        raise Exception(f"Channel must be {min_ch}-{max_ch}: {channel}")
+        raise Exception(f"Channel must be {min_ch}-{max_ch}: {channel}?")
 
 
-class MCP3208Adafruit(MCP3208):
+class MCP3208Gpiozero:
+    # [skip pep8] ignore=E501
+    # noinspection LongLine
     """
-    using Adafruit_GPIO.SPI,
-    Hardware-based SPI implementation using the spidev interface.
+    using gpiozero SPI device,
+    GPIO Zero: a library for controlling the Raspberry Pi's GPIO pins
+
+    https://gpiozero.readthedocs.io/en/v1.2.0/_modules/gpiozero/spi_devices.html#MCP3208
+    https://gpiozero.readthedocs.io/en/v1.2.0/api_spi.html#gpiozero.MCP3208
     """
 
-    def __init__(self, device: int = 0, speed: int = 1_000_000):
-        self.__port = 0
+    def __init__(self, port: int = 0, device: int = 0):
         self.__device = device
-        self.__speed = speed
-        super().__init__()
-        self.__spi = SPI.SpiDev(self.__port, self.__device,
-                                max_speed_hz=self.__speed)
-        self.__spi.set_mode(0)
-        self.__spi.set_bit_order(SPI.MSBFIRST)
+        self.__port = port
 
     @property
     def info(self):
@@ -37,11 +46,48 @@ class MCP3208Adafruit(MCP3208):
 
     def read(self, channel):
         """
-        overridden mcp3208.MCP3208.MCP3208.read(self, ch: {__and__}) -> int
+        Read input channel of MCP3208
+
+        :param channel: 0-7 (D0 - D7 of MCP3208)
+        :return: raw data value (12bit 0 - 4095)
+        """
+        _check_channel_range(channel, _MIN_CHANNEL, _MAX_CHANNEL)
+        return gpiozero.MCP3208(channel,
+                                differential=False,
+                                max_voltage=3.3,
+                                port=self.__port,
+                                device=self.__device).raw_value
+
+
+class MCP3208Adafruit(mcp3208.MCP3208):
+    """
+    using Adafruit_GPIO.SPI,
+    Hardware-based SPI implementation using the spidev interface.
+    """
+
+    def __init__(self, port: int = 0, device: int = 0, speed: int = 1_000_000):
+        self.__port = port
+        self.__device = device
+        self.__speed = speed
+        super().__init__()
+        self.__spi = Adafruit_GPIO.SPI.SpiDev(self.__port, self.__device,
+                                              max_speed_hz=self.__speed)
+        self.__spi.set_mode(0)
+        self.__spi.set_bit_order(Adafruit_GPIO.SPI.MSBFIRST)
+
+    @property
+    def info(self):
+        return f"ID:{id(self)} {self.__repr__()}"
+
+    def read(self, channel):
+        """
+        overridden mcp3208.MCP3208.read(self, ch: {__and__}) -> int\n
+        Read input channel of MCP3208
 
         :param channel: 0-7 (D0 - D7 of MCP3208)
         :return: raw data value (12bit 0 - 4095)"""
-        _check_channel_range(channel, 0, 7)
+
+        _check_channel_range(channel, _MIN_CHANNEL, _MAX_CHANNEL)
 
         cmd = 128  # 1000 0000
         cmd += 64  # 1100 0000
@@ -61,7 +107,7 @@ class MCP3208Spidev:
     using built-in module spidev
     """
 
-    def __init__(self, device: int = 0, speed: int = 1_000_000):
+    def __init__(self, port: int = 0, device: int = 0, speed: int = 1_000_000):
         # [skip pep8] ignore=E501
         # noinspection LongLine
         """
@@ -71,7 +117,7 @@ class MCP3208Spidev:
         """
         self.__speed = speed
         self.__device = device
-        self.__bus = 0
+        self.__bus = port
         self.__adc = 0
         self.__data = 0
         self.__spi = spidev.SpiDev()
@@ -93,7 +139,7 @@ class MCP3208Spidev:
         :param channel: 0-7 (D0 - D7 of MCP3208)
         :return: raw data value (12bit 0 - 4095)
         """
-        _check_channel_range(channel, 0, 7)
+        _check_channel_range(channel, _MIN_CHANNEL, _MAX_CHANNEL)
 
         self.__adc = self.__spi.xfer2(
             [
